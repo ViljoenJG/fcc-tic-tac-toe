@@ -1,6 +1,6 @@
 let originalBoard;
-const human = 'X';
-const ai = 'O';
+let human = 'X';
+let ai = 'O';
 
 const winningCombos = [
   [0,1,2],
@@ -16,10 +16,27 @@ const winningCombos = [
 const cells = document.querySelectorAll('.cell');
 startGame();
 
+function toggleWeapon(weapon) {
+  human = weapon;
+  ai = weapon === 'X' ? 'O' : 'X';
+
+  document.querySelector('#weapon').innerText = weapon;
+
+  document
+    .getElementById(weapon === 'X' ? 'chooseX' : 'chooseO')
+    .classList.toggle('weapon-selected');
+
+    document
+      .getElementById(weapon === 'O' ? 'chooseX' : 'chooseO')
+      .classList.toggle('weapon-selected');
+}
+
 function startGame() {
   document.querySelector('.complete').style.display = 'none';
   document.querySelector('.complete .text').innerText = '';
+  document.querySelector('#choose-weapon').style.display = 'block';
   originalBoard = Array.from(Array(9).keys());
+
   cells.forEach(function(cell) {
     cell.innerText = '';
     cell.style.removeProperty('background-color');
@@ -28,11 +45,19 @@ function startGame() {
 }
 
 function handleClick(e) {
+  hideWeaponSelector();
   if (!isNaN(Number(originalBoard[e.target.id]))) {
     turn(e.target.id, human);
     if (!checkWin(originalBoard, human) && !checkTie())
       turn(aiMove(), ai);
   }
+}
+
+function hideWeaponSelector() {
+  let el = document.querySelector('#choose-weapon');
+  let current = el.style.display;
+  if (current !== 'none')
+    el.style.display = 'none'
 }
 
 function turn(id, player) {

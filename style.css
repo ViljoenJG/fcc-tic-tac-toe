@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Bungee');
+
+body {
+  font-family: 'Bungee', cursive, sans-serif;
+  text-align: center;
+}
+
 td {
   border: 2px solid #333;
   height: 100px;
@@ -31,22 +38,56 @@ table tr td:last-child {
 }
 
 #replay {
-  padding: 8px;
-  border-radius: 3px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: white;
+  background: skyblue;
+  text-decoration: none;
+}
+
+#replay:hover {
+  background: lightblue;
+  text-decoration: none;
 }
 
 .complete {
   display: none;
-  width: 200px;
+  width: 300px;
+  left: calc(50% - 150px);
   top: 120px;
-  background-color: rgba(205,133,63, 0.8);
+  background-color: rgba(0, 128, 128, 0.9);
   position: absolute;
-  left: 50%;
-  margin-left: -100px;
   padding-top: 50px;
   padding-bottom: 50px;
   text-align: center;
   border-radius: 5px;
   color: white;
   font-size: 2em;
+}
+
+.btn {
+  background-color: white;
+  color: black;
+  border: 2px solid #555555;
+  border-radius: 5px;
+  font-family: 'Bungee', cursive, sans-serif;
+  padding: 16px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+
+.weapon-selected {
+  background-color: #555555;
+  color: white;
+}
+
+
+.btn:hover {
+  background-color: SlateGray;
+  color: white;
 }

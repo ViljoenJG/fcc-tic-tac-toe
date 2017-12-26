@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
+    <h1>Tic-Tac-Toe</h1>
+    <h3>Player: <span id="weapon">X</span></h3>
     <table>
       <tr>
         <td class="cell" id="0"></td>
@@ -27,8 +29,14 @@
 
     <div class="complete">
       <div class="text"></div>
+      <button id="replay" onClick="startGame()">Replay</button>
     </div>
-    <button id="replay" onClick="startGame()">Replay</button>
+
+    <div id="choose-weapon">
+      <h3>Choose your weapon</h3>
+      <span class="btn weapon-selected" id="chooseX" onClick="toggleWeapon('X')">X</span>
+      <span class="btn" id="chooseO" onClick="toggleWeapon('O')">O</span>
+    </div>
 
     <script src="./app.js"></script>
   </body>
