@@ -1,5 +1,4 @@
 let originalBoard;
-let gameWon = false;
 const human = 'X';
 const ai = 'O';
 
@@ -18,10 +17,9 @@ const cells = document.querySelectorAll('.cell');
 startGame();
 
 function startGame() {
-  gameWon = false;
   document.querySelector('.complete').style.display = 'none';
   document.querySelector('.complete .text').innerText = '';
-  originalBoard = Array.from(Array(9).keys()).map(() => 0);
+  originalBoard = Array.from(Array(9).keys());
   cells.forEach(function(cell) {
     cell.innerText = '';
     cell.style.removeProperty('background-color');
@@ -30,9 +28,11 @@ function startGame() {
 }
 
 function handleClick(e) {
-  if (originalBoard[e.target.id]) return;
-  turn(e.target.id, human);
-  if (!checkTie()) turn(aiMove(), ai);
+  if (!isNaN(Number(originalBoard[e.target.id]))) {
+    turn(e.target.id, human);
+    if (!checkWin(originalBoard, human) && !checkTie())
+      turn(aiMove(), ai);
+  }
 }
 
 function turn(id, player) {
@@ -59,18 +59,19 @@ function anounceWinner(winner) {
 }
 
 function checkTie() {
-  if (!gameWon && availableMoves().length === 0) {
+  if (availableMoves().length === 0) {
     cells.forEach(cell => {
       cell.style.backgroundColor = 'green';
       cell.removeEventListener('click', handleClick, false);
     });
+
+    anounceWinner('It\'s a Tie')
     return true;
   }
   return false;
 }
 
 function gameOver(winner) {
-  gameWon = true;
   winningCombos[winner.index].forEach((i) => {
     document.getElementById(i).style.backgroundColor =
       winner.player === human ? 'blue' : 'red';
@@ -84,12 +85,61 @@ function gameOver(winner) {
 }
 
 function availableMoves() {
-  return originalBoard.reduce((acc, e, i) => {
-    if (!e) acc.push(i);
-    return acc;
-  }, [])
+  return originalBoard.filter(x => !isNaN(Number(x)));
 }
 
 function aiMove() {
-  return availableMoves()[0]
+  return getBestMove(originalBoard, ai).index;
+}
+
+function getBestMove(board, player) {
+  let openSpots = availableMoves(board);
+
+  if (checkWin(board, human)) {
+    return { score: -10 };
+  } else if (checkWin(board, ai)) {
+    return { score: 10 };
+  } else if (openSpots.length === 0) {
+    return { score: 0 };
+  }
+
+  let moves = [];
+  openSpots.forEach((spot, i) => {
+    let move = { index: board[spot] };
+    board[spot] = player;
+
+    let result;
+
+    if (player === ai) {
+      result = getBestMove(board, human);
+    } else {
+      result = getBestMove(board, ai);
+    }
+
+    move.score = result.score;
+    board[spot] = move.index;
+    moves.push(move);
+  });
+
+  let bestMove;
+
+  if (player === ai) {
+    let bestScore = -10000;
+    moves.forEach((move, i) => {
+      if (move.score > bestScore) {
+        bestScore = move.score;
+        bestMove = i;
+      }
+    });
+  } else {
+    let bestScore = 10000;
+    moves.forEach((move, i) => {
+      if (move.score < bestScore) {
+        bestScore = move.score;
+        bestMove = i;
+      }
+    });
+  }
+
+  return moves[bestMove];
 }
