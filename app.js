@@ -1,4 +1,5 @@
 let originalBoard;
+let gameWon = false;
 const human = 'X';
 const ai = 'O';
 
@@ -17,7 +18,10 @@ const cells = document.querySelectorAll('.cell');
 startGame();
 
 function startGame() {
-  originalBoard = Array.from(Array(9).keys());
+  gameWon = false;
+  document.querySelector('.complete').style.display = 'none';
+  document.querySelector('.complete .text').innerText = '';
+  originalBoard = Array.from(Array(9).keys()).map(() => 0);
   cells.forEach(function(cell) {
     cell.innerText = '';
     cell.style.removeProperty('background-color');
@@ -26,39 +30,66 @@ function startGame() {
 }
 
 function handleClick(e) {
+  if (originalBoard[e.target.id]) return;
   turn(e.target.id, human);
+  if (!checkTie()) turn(aiMove(), ai);
 }
 
 function turn(id, player) {
   originalBoard[id] = player;
   document.getElementById(id).innerText = player;
-  let gameWon = checkWin(originalBoard, player);
-
-  if (gameWon) {
-    return gameOver(gameWon);
-  }
+  let winner = checkWin(originalBoard, player);
+  if (winner) return gameOver(winner);
 }
 
 function checkWin(board, player) {
   let plays = board.reduce((ac, el, i) =>
     (el === player) ? ac.concat(i) : ac, []);
 
-  let gameWon = null;
-  winningCombos.forEach((combo, index) => {
-    if (combo.every(e => plays.indexOf(e) !== -1)) {
-      gameWon = {index, player};
-    }
-  })
-
-  return gameWon;
+  return winningCombos.reduce((acc, combo, index) => {
+    if (!acc && combo.every(e => plays.indexOf(e) !== -1))
+      return { index, player };
+    return acc;
+  }, null);
 }
 
-function gameOver(gameWon) {
-  winningCombos[gameWon.index].forEach((i) => {
-    document.getElementById(i).style.backgroundColor =
-      gameWon.player === human ? 'blue' : 'red';
+function anounceWinner(winner) {
+  document.querySelector('.complete').style.display = 'block';
+  document.querySelector('.complete .text').innerText = winner
+}
 
-    cells.forEach(cell =>
-      cell.removeEventListener('click', handleClick, false))
+function checkTie() {
+  if (!gameWon && availableMoves().length === 0) {
+    cells.forEach(cell => {
+      cell.style.backgroundColor = 'green';
+      cell.removeEventListener('click', handleClick, false);
+    });
+    return true;
+  }
+  return false;
+}
+
+function gameOver(winner) {
+  gameWon = true;
+  winningCombos[winner.index].forEach((i) => {
+    document.getElementById(i).style.backgroundColor =
+      winner.player === human ? 'blue' : 'red';
   })
+
+  cells.forEach(cell =>
+    cell.removeEventListener('click', handleClick, false));
+
+  anounceWinner(winner.player === human ?
+    'You are the winner!' : 'You lose...');
+}
+
+function availableMoves() {
+  return originalBoard.reduce((acc, e, i) => {
+    if (!e) acc.push(i);
+    return acc;
+  }, [])
+}
+
+function aiMove() {
+  return availableMoves()[0]
 }
